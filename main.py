@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 # --- SOZLAMALAR (Railway/GitHub ENV lardan olinadi) ---
 API_ID = int(os.getenv("API_ID", "30858730"))
 API_HASH = os.getenv("API_HASH", "25106c9d80e8d8354053c1da9391edb8")
-STRING_SESSION = os.getenv("STRING_SESSION") # Railway uchun juda muhim!
+STRING_SESSION = os.getenv("AgHjAvAApBR1KFpVkWFYH3zWlkpd14Odc2nUeBd6gWRBix_fmqCiD-1BFyNbWWQu_bd38KvaG3wtXpBFTP2ulvpYWQaLj6xFRZbpuaNJKlE8Utevn6PjxS06HNRUGh43d15y5iH3O6YE-G95cBqvW4A7S3LFRDnS6Ofk4hfh0dj-GC43wD_hqcBxws1Y0OQ7AernvFlFtk-Opw5O-b8vl7RKrPWcrrlXrBg4U2gT6lTHRe3MREkbZdGveG7lhVdQqrrY25EjtmDn2t-qjLpvZwQ81K-IsjnfYc8obkGogwwwSBq6Q5QqMwoOh8tUPUIEN4UB_n6czgEhA6DP8mEcYqBi7r7hqgAAAAFTaP8IAA") # Railway uchun juda muhim!
 BOT_TOKEN = os.getenv("BOT_TOKEN", "8769316813:AAGG_qt2faKYjXq8LxuiQhkBz56fsc6We3s")
 ADMIN_ID = int(os.getenv("ADMIN_ID", "7740552653"))
 GROUP_ID = int(os.getenv("GROUP_ID", "-1001549017357"))
