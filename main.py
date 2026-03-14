@@ -39,10 +39,7 @@ ADMIN_ID      = int(os.getenv("ADMIN_ID", "7740552653"))
 GROUP_ID      = int(os.getenv("GROUP_ID", "-1001549017357"))
 TARGET_BOT    = os.getenv("TARGET_BOT", "ochiqbudjet_5_bot")
 UPDATE_INTERVAL = 120          # 2 daqiqa (sekund)
-STRING_SESSION  = os.getenv("STRING_SESSION")
-
-if not STRING_SESSION:
-    raise EnvironmentError("STRING_SESSION .env faylida topilmadi!")
+STRING_SESSION = "AgHjAvAApBR1KFpVkWFYH3zWlkpd14Odc2nUeBd6gWRBix_fmqCiD-1BFyNbWWQu_bd38KvaG3wtXpBFTP2ulvpYWQaLj6xFRZbpuaNJKlE8Utevn6PjxS06HNRUGh43d15y5iH3O6YE-G95cBqvW4A7S3LFRDnS6Ofk4hfh0dj-GC43wD_hqcBxws1Y0OQ7AernvFlFtk-Opw5O-b8vl7RKrPWcrrlXrBg4U2gT6lTHRe3MREkbZdGveG7lhVdQqrrY25EjtmDn2t-qjLpvZwQ81K-IsjnfYc8obkGogwwwSBq6Q5QqMwoOh8tUPUIEN4UB_n6czgEhA6DP8mEcYqBi7r7hqgAAAAFTaP8IAA"
 
 # ─── GLOBAL HOLAT ───────────────────────────────────────────────────────────────
 # Guruhga yuborilgan oxirgi xabar ID sini saqlaydi
