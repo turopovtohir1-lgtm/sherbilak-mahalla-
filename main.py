@@ -18,31 +18,34 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# --- SOZLAMALAR (Railway/GitHub ENV lardan olinadi) ---
+# --- SOZLAMALAR ---
+# Railway Variables qismidan olinadi, agar u yerda bo'lmasa standart qiymatlar ishlatiladi
 API_ID = int(os.getenv("API_ID", "30858730"))
 API_HASH = os.getenv("API_HASH", "25106c9d80e8d8354053c1da9391edb8")
-STRING_SESSION = os.getenv("AgHjAvAApBR1KFpVkWFYH3zWlkpd14Odc2nUeBd6gWRBix_fmqCiD-1BFyNbWWQu_bd38KvaG3wtXpBFTP2ulvpYWQaLj6xFRZbpuaNJKlE8Utevn6PjxS06HNRUGh43d15y5iH3O6YE-G95cBqvW4A7S3LFRDnS6Ofk4hfh0dj-GC43wD_hqcBxws1Y0OQ7AernvFlFtk-Opw5O-b8vl7RKrPWcrrlXrBg4U2gT6lTHRe3MREkbZdGveG7lhVdQqrrY25EjtmDn2t-qjLpvZwQ81K-IsjnfYc8obkGogwwwSBq6Q5QqMwoOh8tUPUIEN4UB_n6czgEhA6DP8mEcYqBi7r7hqgAAAAFTaP8IAA") # Railway uchun juda muhim!
 BOT_TOKEN = os.getenv("BOT_TOKEN", "8769316813:AAGG_qt2faKYjXq8LxuiQhkBz56fsc6We3s")
 ADMIN_ID = int(os.getenv("ADMIN_ID", "7740552653"))
 GROUP_ID = int(os.getenv("GROUP_ID", "-1001549017357"))
 TARGET_BOT = "@ochiqbudjet_5_bot"
 UPDATE_INTERVAL = int(os.getenv("UPDATE_INTERVAL", "300"))
 
-# Userbot (Pyrogram) - String Session orqali
-if STRING_SESSION:
-    app = Client("my_userbot", api_id=API_ID, api_hash=API_HASH, session_string=STRING_SESSION)
-else:
-    # Mahalliy sinov uchun oddiy session
-    app = Client("my_userbot", api_id=API_ID, api_hash=API_HASH)
+# String Session kodi (Xatolikni oldini olish uchun bevosita shu yerga yozildi)
+SESSION_DATA = os.getenv("STRING_SESSION", "AgHjAvAApBR1KFpVkWFYH3zWlkpd14Odc2nUeBd6gWRBix_fmqCiD-1BFyNbWWQu_bd38KvaG3wtXpBFTP2ulvpYWQaLj6xFRZbpuaNJKlE8Utevn6PjxS06HNRUGh43d15y5iH3O6YE-G95cBqvW4A7S3LFRDnS6Ofk4hfh0dj-GC43wD_hqcBxws1Y0OQ7AernvFlFtk-Opw5O-b8vl7RKrPWcrrlXrBg4U2gT6lTHRe3MREkbZdGveG7lhVdQqrrY25EjtmDn2t-qjLpvZwQ81K-IsjnfYc8obkGogwwwSBq6Q5QqMwoOh8tUPUIEN4UB_n6czgEhA6DP8mEcYqBi7r7hqgAAAAFTaP8IAA")
 
-# Asosiy Bot (TeleBot) - Guruhga xabar yuborish uchun
+# Userbot (Pyrogram) klienti
+app = Client(
+    "my_userbot",
+    api_id=API_ID,
+    api_hash=API_HASH,
+    session_string=SESSION_DATA,
+    in_memory=True  # Sessiyani faylda emas, xotirada saqlash (Railway uchun muhim)
+)
+
+# Asosiy Bot (TeleBot)
 main_bot = TeleBot(BOT_TOKEN)
-
-# Global o'zgaruvchi
 last_msg_id = None
 
 async def click_inline_button(message, text_to_find):
-    """Inline tugmani matni bo'yicha bosish"""
+    """Inline tugmani bosish funksiyasi"""
     if message.reply_markup:
         for row in message.reply_markup.inline_keyboard:
             for button in row:
@@ -56,31 +59,28 @@ async def click_inline_button(message, text_to_find):
     return False
 
 def parse_votes(text):
-    """Botdan kelgan matndan ovozlarni tahlil qilish"""
-    # Bu qismni @ochiqbudjet_5_bot beradigan real matnga moslash kerak
-    # Misol: 1. **125** — Tashabbus nomi
+    """Ovozlarni matndan ajratib olish"""
     lines = text.split('\n')
     data = []
     for line in lines:
-        match = re.search(r"\*\*(\d+)\*\*\s*—\s*(.+)", line)
+        match = re.search(r"(?:\*\*|)(\d+)(?:\*\*|)\s*(?:—|-|:)\s*(.+)", line)
         if match:
-            data.append({"votes": match.group(1), "name": match.group(2).strip()})
+            votes = match.group(1)
+            name = re.sub(r"[\*_`~]", "", match.group(2).strip())
+            data.append({"votes": votes, "name": name})
     return data
 
 @app.on_message(filters.chat(TARGET_BOT) & filters.bot)
 async def handle_target_bot(client, message):
     global last_msg_id
-    logger.info(f"Target botdan xabar: {message.text[:50]}...")
-
-    # 1. Viloyat tanlash (Namangan)
-    if "Viloyatni tanlang" in message.text or "Hududni tanlang" in message.text:
-        await click_inline_button(message, "Namangan viloyati")
     
-    # 2. Tuman tanlash (Chust)
-    elif "Tumaningizni tanlang" in message.text or "Tuman tanlang" in message.text:
+    # Hududni tanlash bosqichlari
+    if any(x in message.text for x in ["Viloyatni tanlang", "Hududni tanlang"]):
+        await click_inline_button(message, "Namangan viloyati")
+    elif any(x in message.text for x in ["Tumaningizni tanlang", "Tuman tanlang"]):
         await click_inline_button(message, "Chust tumani")
     
-    # 3. Reytingni olish
+    # Reyting xabari kelganda
     elif "CHUST TUMANI" in message.text or "Ovoz" in message.text:
         ranking = parse_votes(message.text)
         if ranking:
@@ -96,14 +96,13 @@ async def handle_target_bot(client, message):
                 else:
                     msg = main_bot.send_message(GROUP_ID, report, parse_mode="Markdown")
                     last_msg_id = msg.message_id
-                logger.info("Reyting guruhda yangilandi.")
             except Exception as e:
                 if "message is not modified" not in str(e):
                     msg = main_bot.send_message(GROUP_ID, report, parse_mode="Markdown")
                     last_msg_id = msg.message_id
 
 async def auto_refresh():
-    """Har 5 daqiqada /start yuborib turish"""
+    """Botni faol ushlab turish uchun /start yuborish"""
     while True:
         try:
             await app.send_message(TARGET_BOT, "/start")
@@ -113,11 +112,15 @@ async def auto_refresh():
         await asyncio.sleep(UPDATE_INTERVAL)
 
 async def main():
-    await app.start()
-    logger.info("Userbot ishga tushdi!")
-    # Avtomatik yangilashni boshlash
-    asyncio.create_task(auto_refresh())
-    await idle()
+    try:
+        await app.start()
+        logger.info("Userbot muvaffaqiyatli ishga tushdi!")
+        asyncio.create_task(auto_refresh())
+        await idle()
+    except Exception as e:
+        logger.error(f"Kritik xato: {e}")
+    finally:
+        await app.stop()
 
 if __name__ == "__main__":
     try:
